@@ -181,7 +181,7 @@ public class TaskUI {
      * @see #inputChangeInformation()
      * @see #inputDeleteInformation()
      */
-    public void selectSubMenu() throws AppException {
+    public void selectSubMenu() {
 
         boolean flg = true;
 
@@ -267,6 +267,8 @@ public class TaskUI {
                         Integer.parseInt(code),
                         inforCode,
                         loginUser);
+
+                flg = false;
 
             } catch (IOException e) {
                 e.printStackTrace();

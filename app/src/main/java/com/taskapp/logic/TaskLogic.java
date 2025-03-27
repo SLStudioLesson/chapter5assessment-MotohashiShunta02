@@ -1,5 +1,6 @@
 package com.taskapp.logic;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -80,37 +81,30 @@ public class TaskLogic {
      */
     public void save(int code, String name, int repUserCode,
             User loginUser) throws AppException {
+        // 存在するユーザーか確認
+        User user = userDataAccess.findByCode(repUserCode);
 
-        try {
-            // 存在するユーザーか確認
-            User user = userDataAccess.findByCode(repUserCode);
-
-            // スロー
-            if (user == null) {
-                //System.out.println("表示:入った");
-                throw new AppException("存在するユーザーコードを入力してください");
-            }
-
-            // taskマッピング
-            Task task = new Task(code, name, 0, loginUser);
-
-            // task.csvへ書き込み
-            taskDataAccess.save(task);
-
-            // logマッピング
-            Log log = new Log(task.getCode(),
-                    loginUser.getCode(),
-                    task.getStatus(),
-                    LocalDate.now());
-
-            //csvへ書き込み
-            logDataAccess.save(log);
-
-            System.out.println(task.getName() + "の登録が完了しました。");
-
-        } catch (Exception e) {
-            // TODO: handle exception
+        // スロー
+        if (user == null) {
+            throw new AppException("存在するユーザーコードを入力してください");
         }
+
+        // taskマッピング
+        Task task = new Task(code, name, 0, loginUser);
+
+        // task.csvへ書き込み
+        taskDataAccess.save(task);
+
+        // logマッピング
+        Log log = new Log(task.getCode(),
+                loginUser.getCode(),
+                task.getStatus(),
+                LocalDate.now());
+
+        // csvへ書き込み
+        logDataAccess.save(log);
+
+        System.out.println(task.getName() + "の登録が完了しました。");
 
     }
 
@@ -126,8 +120,46 @@ public class TaskLogic {
      * @throws AppException タスクコードが存在しない、またはステータスが前のステータスより1つ先でない場合にスローされます
      */
     public void changeStatus(int code, int status,
-    User loginUser) throws AppException {
-        
+            User loginUser) throws AppException {
+
+        Task task = taskDataAccess.findByCode(code);
+
+        if (task == null) {
+            throw new AppException("存在するタスクコードを入力してください");
+        }
+
+        // 進行状況変数
+        int taskStatus = task.getStatus();
+
+        if (status == 2) {
+            throw new AppException("ステータスは、前のステータスより1つ先のもののみを選択してください");
+        } else if (status == 1) {
+            if (taskStatus == 1 || taskStatus == 2) {
+                throw new AppException("ステータスは、前のステータスより1つ先のもののみを選択してください");
+            }
+        } else if (status == 0) {
+            if (taskStatus == 0 || taskStatus == 2) {
+                throw new AppException("ステータスは、前のステータスより1つ先のもののみを選択してください");
+            }
+        }
+
+        // マッピング
+        Task task2 = new Task(task.getCode(), task.getName(), status, loginUser);
+
+        // csvへ書き込み
+        taskDataAccess.update(task2);
+
+        // logマッピング
+        Log log = new Log(task2.getCode(),
+                loginUser.getCode(),
+                task2.getStatus(),
+                LocalDate.now());
+
+        // csvへ書き込み
+        logDataAccess.save(log);
+
+        System.out.println("ステータスの変更が完了しました。");
+
     }
 
     /**
