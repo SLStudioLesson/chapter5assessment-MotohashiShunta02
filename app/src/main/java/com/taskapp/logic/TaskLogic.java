@@ -90,7 +90,7 @@ public class TaskLogic {
         }
 
         // taskマッピング
-        Task task = new Task(code, name, 0, loginUser);
+        Task task = new Task(code, name, 0, user);
 
         // task.csvへ書き込み
         taskDataAccess.save(task);
@@ -132,7 +132,9 @@ public class TaskLogic {
         int taskStatus = task.getStatus();
 
         if (status == 2) {
-            throw new AppException("ステータスは、前のステータスより1つ先のもののみを選択してください");
+            if (taskStatus == 2 || taskStatus == 0) {
+                throw new AppException("ステータスは、前のステータスより1つ先のもののみを選択してください");
+            }
         } else if (status == 1) {
             if (taskStatus == 1 || taskStatus == 2) {
                 throw new AppException("ステータスは、前のステータスより1つ先のもののみを選択してください");
