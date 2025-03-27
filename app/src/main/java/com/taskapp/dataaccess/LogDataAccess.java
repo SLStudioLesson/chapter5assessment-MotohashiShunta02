@@ -1,8 +1,13 @@
 package com.taskapp.dataaccess;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import com.taskapp.model.Log;
+
 public class LogDataAccess {
     private final String filePath;
-
 
     public LogDataAccess() {
         filePath = "app/src/main/resources/logs.csv";
@@ -10,6 +15,7 @@ public class LogDataAccess {
 
     /**
      * 自動採点用に必要なコンストラクタのため、皆さんはこのコンストラクタを利用・削除はしないでください
+     * 
      * @param filePath
      */
     public LogDataAccess(String filePath) {
@@ -21,13 +27,20 @@ public class LogDataAccess {
      *
      * @param log 保存するログ
      */
-    // public void save(Log log) {
-    //     try () {
+    public void save(Log log) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath,true))) {
 
-    //     } catch (IOException e) {
-    //         e.printStackTrace();
-    //     }
-    // }
+            // 改行
+            writer.newLine();
+
+            // 書き込み
+            writer.write(log.getTaskCode() + "," + log.getChangeUserCode() + "," +
+                    log.getStatus() + "," + log.getChangeDate());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * すべてのログを取得します。
@@ -35,12 +48,12 @@ public class LogDataAccess {
      * @return すべてのログのリスト
      */
     // public List<Log> findAll() {
-    //     try () {
+    // try () {
 
-    //     } catch (IOException e) {
-    //         e.printStackTrace();
-    //     }
-    //     return null;
+    // } catch (IOException e) {
+    // e.printStackTrace();
+    // }
+    // return null;
     // }
 
     /**
@@ -50,11 +63,11 @@ public class LogDataAccess {
      * @param taskCode 削除するログのタスクコード
      */
     // public void deleteByTaskCode(int taskCode) {
-    //     try () {
+    // try () {
 
-    //     } catch (IOException e) {
-    //         e.printStackTrace();
-    //     }
+    // } catch (IOException e) {
+    // e.printStackTrace();
+    // }
     // }
 
     /**
